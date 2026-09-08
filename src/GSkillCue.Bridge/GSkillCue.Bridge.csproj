@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\GSkillCue.Core\GSkillCue.Core.csproj" />
+    <ProjectReference Include="..\GSkillCue.GSkillRam\GSkillCue.GSkillRam.csproj" />
+    <ProjectReference Include="..\GSkillCue.ICue\GSkillCue.ICue.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

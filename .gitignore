@@ -1,0 +1,22 @@
+# build output
+bin/
+obj/
+dist/
+*.user
+
+# IDE
+.vs/
+.idea/
+*.suo
+
+# local reference clones (OpenRGB, cue-sdk) — not part of this repo
+reference/
+tools/
+
+# machine-specific SPD dumps
+spd-*.txt
+
+# vendored: keep only the small runtime deps that the build needs
+vendor/icue/extracted/
+vendor/icue/*.zip
+vendor/pawnio/installer/

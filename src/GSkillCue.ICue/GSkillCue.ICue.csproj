@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GSkillCue.Core\GSkillCue.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Redistributable iCUE SDK native DLL (Corsair permits redistribution for apps that
+         interface with iCUE). Vendored from github.com/CorsairOfficial/cue-sdk release v4.0.84. -->
+    <None Include="$(MSBuildThisFileDirectory)..\..\vendor\icue\iCUESDK.x64_2019.dll">
+      <Link>iCUESDK.x64_2019.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>GSkillCueTray</AssemblyName>
+    <RootNamespace>GSkillCue.Tray</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon></ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GSkillCue.Core\GSkillCue.Core.csproj" />
+    <ProjectReference Include="..\GSkillCue.Bridge\GSkillCue.Bridge.csproj" />
+    <ProjectReference Include="..\GSkillCue.ICue\GSkillCue.ICue.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\..\vendor\pawnio\PawnIOLib.dll" Link="PawnIOLib.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\vendor\pawnio\SmbusPIIX4.bin" Link="SmbusPIIX4.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\vendor\icue\iCUESDK.x64_2019.dll" Link="iCUESDK.x64_2019.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

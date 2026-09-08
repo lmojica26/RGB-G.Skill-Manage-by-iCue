@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>gskillcue</AssemblyName>
+    <RootNamespace>GSkillCue.Cli</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GSkillCue.Core\GSkillCue.Core.csproj" />
+    <ProjectReference Include="..\GSkillCue.Smbus\GSkillCue.Smbus.csproj" />
+    <ProjectReference Include="..\GSkillCue.GSkillRam\GSkillCue.GSkillRam.csproj" />
+    <ProjectReference Include="..\GSkillCue.ICue\GSkillCue.ICue.csproj" />
+    <ProjectReference Include="..\GSkillCue.Bridge\GSkillCue.Bridge.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\..\vendor\pawnio\PawnIOLib.dll" Link="PawnIOLib.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\vendor\pawnio\SmbusPIIX4.bin" Link="SmbusPIIX4.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
