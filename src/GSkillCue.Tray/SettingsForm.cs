@@ -16,6 +16,8 @@ internal sealed class SettingsForm : Form
     private readonly Label _fpsLabel = new() { AutoSize = true };
     private readonly Label _brightnessLabel = new() { AutoSize = true };
     private readonly Label _smoothingLabel = new() { AutoSize = true };
+    private readonly CheckBox _startWithWindows = new() { Text = "Start GSkillCue automatically when Windows starts", AutoSize = true };
+    private bool _autoStartWasEnabled;
 
     public SettingsForm(BridgeConfig config)
     {
@@ -25,32 +27,45 @@ internal sealed class SettingsForm : Form
         MaximizeBox = false;
         MinimizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
-        ClientSize = new Size(430, 430);
+        AutoScaleMode = AutoScaleMode.Dpi;
+        ClientSize = new Size(470, 520);
 
-        var layout = new TableLayoutPanel
+        var grid = new TableLayoutPanel { AutoSize = true, ColumnCount = 2, Padding = new Padding(14, 14, 14, 4) };
+        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110));
+        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        AddRow(grid, "Mirror source", _source);
+        AddRow(grid, "Mapping", _mapping);
+        AddRow(grid, "Frame rate", Stack(_fps, _fpsLabel));
+        AddRow(grid, "Brightness", Stack(_brightness, _brightnessLabel));
+        AddRow(grid, "Smoothing", Stack(_smoothing, _smoothingLabel));
+        AddRow(grid, "On exit", _exit);
+
+        var startupPanel = new FlowLayoutPanel
         {
-            Dock = DockStyle.Fill,
-            Padding = new Padding(14),
-            ColumnCount = 2,
-            AutoSize = true,
+            FlowDirection = FlowDirection.TopDown, AutoSize = true,
+            WrapContents = false, Padding = new Padding(14, 6, 14, 6),
         };
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110));
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        _startWithWindows.Margin = new Padding(0, 2, 0, 4);
+        startupPanel.Controls.Add(_startWithWindows);
+        startupPanel.Controls.Add(new Label
+        {
+            AutoSize = true, ForeColor = SystemColors.GrayText, MaximumSize = new Size(430, 0),
+            Text = "Registers a Scheduled Task so GSkillCue launches elevated at logon with no UAC prompt.\n" +
+                   "Manual start: run GSkillCueTray.exe as administrator.",
+        });
 
-        AddRow(layout, "Mirror source", _source);
-        AddRow(layout, "Mapping", _mapping);
-        AddRow(layout, "Frame rate", Stack(_fps, _fpsLabel));
-        AddRow(layout, "Brightness", Stack(_brightness, _brightnessLabel));
-        AddRow(layout, "Smoothing", Stack(_smoothing, _smoothingLabel));
-        AddRow(layout, "On exit", _exit);
+        var body = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, AutoScroll = true };
+        body.Controls.Add(grid);
+        body.Controls.Add(startupPanel);
 
         var ok = new Button { Text = "OK", DialogResult = DialogResult.OK, Width = 90 };
         var cancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel, Width = 90 };
-        var buttons = new FlowLayoutPanel { FlowDirection = FlowDirection.RightToLeft, Dock = DockStyle.Bottom, Height = 44 };
+        var buttons = new FlowLayoutPanel { FlowDirection = FlowDirection.RightToLeft, Dock = DockStyle.Bottom, Height = 48, Padding = new Padding(10) };
         buttons.Controls.Add(cancel);
         buttons.Controls.Add(ok);
 
-        Controls.Add(layout);
+        Controls.Add(body);
         Controls.Add(buttons);
         AcceptButton = ok;
         CancelButton = cancel;
@@ -75,6 +90,9 @@ internal sealed class SettingsForm : Form
         _fpsLabel.Text = $"{_fps.Value} fps";
         _brightnessLabel.Text = $"{_brightness.Value}%";
         _smoothingLabel.Text = $"{_smoothing.Value}%";
+
+        _autoStartWasEnabled = AutoStart.IsEnabled();
+        _startWithWindows.Checked = _autoStartWasEnabled;
 
         _source.Items.Add("(auto — first fan/cooler/strip)");
         _source.SelectedIndex = 0;
@@ -116,6 +134,27 @@ internal sealed class SettingsForm : Form
             _config.SourceDeviceId = "";
         }
         _config.Clamp();
+
+        if (_startWithWindows.Checked != _autoStartWasEnabled)
+        {
+            bool ok = _startWithWindows.Checked
+                ? AutoStart.TryEnable(out string? err)
+                : AutoStart.TryDisable(out err);
+
+            if (ok)
+            {
+                _config.StartWithWindows = _startWithWindows.Checked;
+            }
+            else
+            {
+                e.Cancel = true; // keep the dialog open so the user sees it didn't take
+                DialogResult = DialogResult.None;
+                MessageBox.Show(this,
+                    $"Could not {(_startWithWindows.Checked ? "enable" : "disable")} start-with-Windows:\n\n{err}\n\n" +
+                    "GSkillCue must be running as administrator to change the Scheduled Task.",
+                    "GSkillCue", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
     }
 
     private static void AddRow(TableLayoutPanel panel, string label, Control control)

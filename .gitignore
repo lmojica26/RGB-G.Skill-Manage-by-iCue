@@ -16,6 +16,9 @@ tools/
 # machine-specific SPD dumps
 spd-*.txt
 
+# local working notes — never publish
+CLAUDE.md
+
 # vendored: keep only the small runtime deps that the build needs
 vendor/icue/extracted/
 vendor/icue/*.zip

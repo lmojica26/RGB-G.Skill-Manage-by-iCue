@@ -28,6 +28,7 @@ internal sealed class TrayContext : ApplicationContext
 
         BuildMenu();
         WarnAboutConflicts();
+        ReconcileAutoStart();
 
         if (_config.AutoStartBridge)
             StartBridge();
@@ -67,9 +68,20 @@ internal sealed class TrayContext : ApplicationContext
         var auto = new ToolStripMenuItem("Start with Windows") { Checked = AutoStart.IsEnabled() };
         auto.Click += (_, _) =>
         {
-            bool now = !auto.Checked;
-            try { AutoStart.SetEnabled(now); _config.StartWithWindows = now; _config.Save(); }
-            catch (Exception ex) { Error($"Could not change autostart: {ex.Message}"); }
+            bool enable = !auto.Checked;
+            bool ok = enable ? AutoStart.TryEnable(out string? err) : AutoStart.TryDisable(out err);
+            if (ok)
+            {
+                _config.StartWithWindows = enable;
+                _config.Save();
+                _tray.ShowBalloonTip(3000, "GSkillCue",
+                    enable ? "GSkillCue will now start with Windows." : "GSkillCue will no longer start with Windows.",
+                    ToolTipIcon.Info);
+            }
+            else
+            {
+                Error($"Could not change start-with-Windows: {err}");
+            }
         };
         m.Items.Add(auto);
 
@@ -135,6 +147,25 @@ internal sealed class TrayContext : ApplicationContext
             BridgeState.Faulted => Color.OrangeRed,
             _ => Color.MediumPurple,
         });
+    }
+
+    /// <summary>
+    /// If the user has asked for start-with-Windows but the task is missing or points at an old
+    /// path (e.g. the folder was moved), quietly re-create it against the current executable.
+    /// </summary>
+    private void ReconcileAutoStart()
+    {
+        if (!_config.StartWithWindows)
+            return;
+        if (AutoStart.IsEnabled())
+        {
+            // Task exists; refresh it so a moved executable still works.
+            AutoStart.TryEnable(out _);
+        }
+        else if (!AutoStart.TryEnable(out string? err))
+        {
+            Log.Warn($"Could not restore start-with-Windows task: {err}");
+        }
     }
 
     private void WarnAboutConflicts()

@@ -86,7 +86,17 @@ gskillcue icue --dump "{device-id}"        # watch values change as you edit an 
 
 ## Everyday use — the tray app
 
-Run **`GSkillCueTray.exe`** (as administrator). It puts an icon in the system tray:
+### Starting it
+
+* **Manually:** run **`GSkillCueTray.exe`** as administrator (right‑click → *Run as administrator*,
+  or just double‑click — it's manifested to prompt for elevation). It minimises straight to the
+  system tray.
+* **Automatically at logon:** open **Settings** and tick **"Start GSkillCue automatically when
+  Windows starts"** (also on the tray right‑click menu as *Start with Windows*). This registers a
+  Scheduled Task that launches it **elevated with no UAC prompt** at every logon, and survives
+  sleep/battery and long uptime. Toggling it needs GSkillCue to be running as administrator.
+
+It puts an icon in the system tray:
 
 | Icon | Meaning |
 |---|---|
@@ -102,8 +112,7 @@ Right‑click for **Start/Stop**, **Mapping** mode, and **Settings…**:
   it across the DIMM LEDs — default), *Per‑DIMM split*
 * **Frame rate**, **Brightness**, **Smoothing**
 * **On exit** — hold the last frame / turn the RAM off / set a static colour
-* **Start with Windows** — installs a Scheduled Task so it launches elevated at logon without a
-  UAC prompt
+* **Start GSkillCue automatically when Windows starts** — see "Starting it" above
 
 Config: `%APPDATA%\GSkillCue\config.json` · Logs: `%APPDATA%\GSkillCue\logs\`
 
